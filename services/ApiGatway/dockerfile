@@ -1,0 +1,23 @@
+# Use a base Node.js image
+FROM node:16
+
+# Set working directory
+WORKDIR /usr/src/app
+
+# Copy package.json and install dependencies
+COPY package*.json ./
+RUN npm install
+
+# Copy the application code
+COPY . .
+
+# Environment variables for the gateway
+ENV PORT=3001
+ENV abonne_SERVICE_URL=http://abonnems:3002
+ENV EMPRUNT_SERVICE_URL=http://empruntms:3003
+
+# Expose the port
+EXPOSE 3001
+
+# Start the Node.js application
+CMD ["node", "server.js"]
