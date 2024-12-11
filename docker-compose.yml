@@ -1,0 +1,76 @@
+version: "3.8"
+
+services:
+
+  frontend:
+    image: rbenfraj46/front_react_biblio:latest
+    environment:
+      - REACT_APP_VERSION=2.0
+      - REACT_APP_API_URL=http://gateway:3001
+    depends_on:
+      - gateway
+    ports:
+      - "3000:80"
+    networks:
+      - app-network  
+
+
+  gateway:
+    image: rbenfraj46/gateway:latest
+    environment:
+      - PORT=3001
+      - abonne_SERVICE_URL=http://abonnems:3002 
+      - EMPRUNT_SERVICE_URL=http://empruntms:3003  
+    depends_on:
+      - abonnems  
+      - empruntms  
+      - mongodb  
+    ports:
+      - "3001:3001"
+    networks:
+      - app-network  
+
+
+  abonnems:
+    image: rbenfraj46/abonnems:latest
+    environment:
+      - FLASK_APP=app.py
+      - FLASK_ENV=production
+      - MONGO_URI=mongodb://mongodb:27017/categoridb 
+    depends_on:
+      - mongodb  
+    ports:
+      - "3002:3002"
+    networks:
+      - app-network  
+
+  # Product Microservice (Flask)
+  empruntms:
+    image: rbenfraj46/empruntms:latest
+    environment:
+      - FLASK_APP=app.py
+      - FLASK_ENV=production
+      - MONGO_URI=mongodb://mongodb:27017/produitdb  
+    depends_on:
+      - mongodb  
+    ports:
+      - "3003:3003"
+    networks:
+      - app-network 
+
+  # MongoDB service
+  mongodb:
+    image: mongo:latest
+    volumes:
+      - mongo-data:/data/db 
+    ports:
+      - "27017:27017"
+    networks:
+      - app-network  
+
+networks:
+  app-network:  
+    driver: bridge  
+
+volumes:
+  mongo-data: 

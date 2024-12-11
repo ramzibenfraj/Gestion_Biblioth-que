@@ -41,3 +41,21 @@ def get_stats():
     return jsonify({
         "documentsCount": documents_count
     })
+@document_bp.route('/disponibilite/<id>', methods=['PATCH'])
+def changer_disponibilite(id):
+    document = mongo.db.documents.find_one({"_id": ObjectId(id)})
+    if not document:
+        return jsonify({"error": "Document introuvable"}), 404
+    
+    # Changer la disponibilité à False
+    mongo.db.documents.update_one({"_id": ObjectId(id)}, {"$set": {"disponibilite": False}})
+    return jsonify({"message": "Disponibilité mise à jour à False"}), 200
+@document_bp.route('/disponibilite/<id>/true', methods=['PATCH'])
+def activer_disponibilite(id):
+    document = mongo.db.documents.find_one({"_id": ObjectId(id)})
+    if not document:
+        return jsonify({"error": "Document introuvable"}), 404
+
+    # Changer la disponibilité à True
+    mongo.db.documents.update_one({"_id": ObjectId(id)}, {"$set": {"disponibilite": True}})
+    return jsonify({"message": "Disponibilité mise à jour à True"}), 200
